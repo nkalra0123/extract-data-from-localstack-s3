@@ -1,3 +1,23 @@
+#! /bin/bash
+
+function cleanup ()
+{
+    echo "in cleanup"
+    rm step1
+    rm raw_data
+    rm filenames
+
+}
+
+function user_finish ()
+{
+    trap EXIT
+    cleanup
+    exit 1;
+}
+
+trap user_finish 1 2 3 15 # SIGHUP SIGINT SIGQUIT SIGTERM
+
 cat recorded_api_calls.json | grep -i "\"a\": \"s3\", \"m\": \"PUT\", \"p\""  | grep -i "\"Content-Type\": \"image"> step1
 
 jq -r .d step1 > raw_data
@@ -16,7 +36,4 @@ do
 
 done
 
-rm step1
-rm raw_data
-rm filenames
-
+cleanup
